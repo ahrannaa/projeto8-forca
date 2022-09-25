@@ -1,53 +1,95 @@
 import palavras from "./palavras";
+import alfabeto from "./Alfabeto";
+import { useState } from "react";
 
 export default function App() {
+  
+  const [tecladoDesabilitado, setTecladoDesabilitado] = useState(true);
+  const [inputDesabilitado, setInputDesabilitado] = useState(true);
+  const [palavraEscolhida, setPalavraEscolhida] = useState([]);
+  const [letrasSelecionadas, setLetrasSelecionadas] = useState([]);
+  const [valorInput, setValorInput ] = useState("");
+
+
+  function inputValor(event){
+    setValorInput(event.target.value)
+  }
+
+  
+    
+    const handleClick = (event) => {
+    const botaoLetra = event.currentTarget;
+    setLetrasSelecionadas((selecionadas) => [...selecionadas, botaoLetra.innerHTML])
+
+    console.log(letrasSelecionadas)
+  };
+
+  function iniciarJogo() {
+    // habilitando teclado
+    setTecladoDesabilitado(false);
+    setInputDesabilitado(false);
+
+    // embaralhando as palavras
+    const palavrasEmbaralhadas = embaralhar(palavras);
+    const palavraEscolhidaStr = palavrasEmbaralhadas[0];
+    const palavraEscolhidaArray = palavraEscolhidaStr.split("");
+
+    setPalavraEscolhida(palavraEscolhidaArray);
+  }
+
+  function embaralhar(array) {
+    const arrayCopia = [...array];
+    for (let i = arrayCopia.length - 1; i > 0; i--) {
+      const test = Math.floor(Math.random() * (i + 1));
+      [arrayCopia[i], arrayCopia[test]] = [arrayCopia[test], arrayCopia[i]];
+    }
+    return arrayCopia;
+  }
+
   return (
     <>
       <div className="container">
         <div className="inicioJogo">
-          <div className="imagemInicial">
-            <img src="imagem/forca0.png" alt="inicio forca" />
+          <div className="direita">
+            <div className="imagemInicial">
+              <img src="imagem/forca0.png" alt="inicio forca" />
+            </div>
           </div>
-          <div className="botaoEscolherPalavra">
-            <button>Escolher Palavra</button>
+
+          <div className="esquerda">
+            <div className="teste">
+              <div className="botaoEscolherPalavra">
+                <button onClick={iniciarJogo}>Escolher Palavra</button>
+              </div>
+              <div className="palavras">
+                <div className="palavraCompleta">
+                  {palavraEscolhida.map((letra, indiceDaLetra) => (
+                    <div className={letra.includes(letrasSelecionadas) ? "cadaLetra border" : "cadaletra"}><p>{letra}</p></div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div className="teclado">
           <div className="alfabeto">
-            <div className="letras">A</div>
-            <div className="letras">B</div>
-            <div className="letras">C</div>
-            <div className="letras">D</div>
-            <div className="letras">E</div>
-            <div className="letras">F</div>
-            <div className="letras">G</div>
-            <div className="letras">H</div>
-            <div className="letras">I</div>
-            <div className="letras">J</div>
-            <div className="letras">K</div>
-            <div className="letras">L</div>
-            <div className="letras">M</div>
-            <div className="letras">N</div>
-            <div className="letras">O</div>
-            <div className="letras">P</div>
-            <div className="letras">Q</div>
-            <div className="letras">R</div>
-            <div className="letras">S</div>
-            <div className="letras">T</div>
-            <div className="letras">U</div>
-            <div className="letras">V</div>
-            <div className="letras">W</div>
-            <div className="letras">X</div>
-            <div className="letras">Y</div>
-            <div className="letras">Z</div>
+            {alfabeto.map((letra) => (
+              <button
+                onClick={handleClick}
+                disabled={tecladoDesabilitado || letrasSelecionadas.includes(letra)}
+                className={tecladoDesabilitado || letrasSelecionadas.includes(letra) ? "letrasClicadas" : "letrasNaoClicadas"}
+              >
+                {letra}
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="chutarPalavra">
           <p>Já sei a palavra!</p>
-          <input></input>
-          <button>Chutar</button>
+          <input disabled={inputDesabilitado} onChange={inputValor}></input>
+          <button onClick>Chutar</button>
         </div>
       </div>
     </>
